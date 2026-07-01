@@ -5,7 +5,7 @@ getPkgConfig() {
   if command -v pkg-config &> /dev/null; then
     echo "pkg-config"
     return 0
-  else if command -v pkgcof &> /dev/null; then
+  elif command -v pkgcof &> /dev/null; then
       echo "pkgconf"
       return 0
   else
@@ -45,11 +45,11 @@ fakeOutput() {
       if $doneFlags; then
         echo "--modversion is incompatible with --cflags and --libs, ignoring" >&2
         return 0
-      else if $doneVariables; then
+      elif $doneVariables; then
         echo "--modversion is incompatible with --variable, ignoring" >&2
         return 0
       else
-        for "$lib" in "$*"; do
+        for lib in "$@"; do
           # Unsure of a good value
           output+=("1.0.0")
         done
@@ -62,20 +62,20 @@ fakeOutput() {
       if $doneFlags; then
         echo "--modversion is incompatible with --cflags and --libs, ignoring" >&2
         return 0
-      else if [[ "$var" == "prefix" ]]; then
-        for "$lib" in "$*"; do
+      elif [[ "$var" == "prefix" ]]; then
+        for lib in "$@"; do
           output+=("$fakePrefix/$lib")
         done
-      else if [[ "$var" == "libdir" ]]; then
-        for "$lib" in "$*"; do
+      elif [[ "$var" == "libdir" ]]; then
+        for lib in "$@"; do
           output+=("$fakePrefix/$lib/lib")
         done
-      else if [[ "$var" == "includedir" ]]; then
-        for "$lib" in "$*"; do
+      elif [[ "$var" == "includedir" ]]; then
+        for lib in "$@"; do
           output+=("$fakePrefix/$lib/include")
         done
       else
-        for "$lib" in "$*"; do
+        for lib in "$@"; do
           output+=("$fakePrefix/$lib/$var")
         done
       fi
@@ -86,11 +86,11 @@ fakeOutput() {
       if $doneModversion; then
         echo "--libs is incompatible with --modversion, ignoring" >&2
         return 0
-      else if $doneVariables; then
+      elif $doneVariables; then
         echo "--libs is incompatible with --variable, ignoring" >&2
         return 0
       else
-        for "$lib" in "$*"; do
+        for lib in "$@"; do
           output+=("-L$fakePrefix/$lib/lib -l$lib")
         done
         doneFlags=true
@@ -101,17 +101,19 @@ fakeOutput() {
     --cflags)
       if $doneModversion; then
         echo "--cflags is incompatible with --modversion, ignoring" >&2
-      else if $doneVariables; then
+      elif $doneVariables; then
         echo "--cflags is incompatible with --variable, ignoring" >&2
       else
-        output+=("-I$fakePrefix/$lib/include")
+        for lib in "$@"; do
+          output+=("-I$fakePrefix/$lib/include")
+        done
         doneFlags=true
       fi
       shift
       ;;
   esac
 
-  echo "$output[*]"
+  echo "${output[*]}"
 }
 
 PKG_CONFIG="$(getPkgConfig 2>&1)"
@@ -154,9 +156,9 @@ done
 readonly ARGS REAL_LIBS FAKE_LIBS PKG_CONFIG
 
 output=()
-for "$arg" in "$ARGS"; do
+for arg in "${ARGS[@]}"; do
   output+=("$(fakeOutput "$arg" "${FAKE_LIBS[@]}")")
-  output+=("$("$PKG_CONFIG" "$arg" "${REAL_LIBS}")")
+  output+=("$("$PKG_CONFIG" "$arg" "${REAL_LIBS[@]}")")
 done
 
-echo "$output[*]"
+echo "${output[*]}"
