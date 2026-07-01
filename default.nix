@@ -38,5 +38,7 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
     ln -s "$out/bin/fake-pkg-config" "$out/bin/pkg-config"
   '';
 
+  passthru.tests = pkgs.callPackage ./tests.nix { fake-pkg-config = finalAttrs.finalPackage; };
+
   meta.mainProgram = "fake-pkg-config";
 })
