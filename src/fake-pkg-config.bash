@@ -1,15 +1,13 @@
-#!/usr/bin/env -S bash -Eeuo
+if [[ -n "${DEBUG:-}" ]]; then set -x; fi
 
 # Find a pkg-config on PATH
 getPkgConfig() {
-  if command -v pkg-config &> /dev/null; then
+  if command -v pkg-config; then
     echo "pkg-config"
-    return 0
-  elif command -v pkgcof &> /dev/null; then
+  elif command -v pkgconf; then
       echo "pkgconf"
-      return 0
   else
-    return 127
+    echo ""
   fi
 }
 
@@ -158,7 +156,10 @@ readonly ARGS REAL_LIBS FAKE_LIBS PKG_CONFIG
 output=()
 for arg in "${ARGS[@]}"; do
   output+=("$(fakeOutput "$arg" "${FAKE_LIBS[@]}")")
-  output+=("$("$PKG_CONFIG" "$arg" "${REAL_LIBS[@]}")")
+
+  if [[ -n "$PKG_CONFIG" && ${#REAL_LIBS[@]} -gt 0  ]]; then
+    output+=("$("$PKG_CONFIG" "$arg" "${REAL_LIBS[@]}")")
+  fi
 done
 
 echo "${output[*]}"

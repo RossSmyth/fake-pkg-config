@@ -26,16 +26,19 @@ pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
     fileset = source;
   };
 
-  postPatch = ''
-    substituteInPlace fake-pkg-config.bash \
-      --replace-fail "#!/usr/bin/env -S bash" "${lib.getExe pkgs.bashNonInteractive}"
-  '';
+  nativeBuildInputs = with pkgs; [
+    makeBinaryWrapper
+  ];
 
   installPhase = ''
     mkdir -p "$out/bin"
 
-    install -Dm744 fake-pkg-config.bash "$out/bin/fake-pkg-config"
-    ln -s "$out/bin/fake-pkg-config" "$out/bin/pkg-config"
+    install -Dm744 fake-pkg-config.bash "$out/bin/.fake-pkg-config"
+
+    makeWrapper "${lib.getExe pkgs.bashNonInteractive}" "$out/bin/fake-pkg-config" \
+      --add-flags "-euo pipefail $out/bin/.fake-pkg-config"
+
+    ln -s "$out/bin/fake-pkg-config" "$out/bin/pkg-config"    
   '';
 
   passthru.tests = pkgs.callPackage ./tests.nix { fake-pkg-config = finalAttrs.finalPackage; };

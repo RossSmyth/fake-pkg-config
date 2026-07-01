@@ -36,6 +36,9 @@ let
         ];
 
         dontUnpack = true;
+        dontBuild = true;
+        doCheck = true;
+        dontFixup = true;
 
         checkPhase = test;
 
