@@ -1,4 +1,4 @@
-#!/bin/env bash -Eeuo
+#!/usr/bin/env -S bash -Eeuo
 
 # Find a pkg-config on PATH
 getPkgConfig() {
