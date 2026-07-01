@@ -15,5 +15,8 @@ mkShell {
   packages = with pkgs; [
     pkg-config
     shellcheck
+    python3
+    uv
+    ty
   ];
 }
