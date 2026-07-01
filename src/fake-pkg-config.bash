@@ -17,7 +17,7 @@ doneFlags=false
 doneVariables=false
 
 # Get a fake prefix to output things to
-readonly fakePrefix="$(mktemp -du nixpkgs.XXXXX)"
+readonly fakePrefix="$(mktemp -du nixpkgs.XXXXX)/fake"
 
 # pkg-config processes on a per-arg basis
 # This means that for every library, all --libs are output,
