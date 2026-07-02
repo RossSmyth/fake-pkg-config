@@ -17,6 +17,7 @@ mkShell {
     shellcheck
     python3
     uv
-    ty
+    pyright
+    ruff
   ];
 }
